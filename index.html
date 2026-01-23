@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KSO VIP - Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap');
+        :root { --primary: #ff3131; --dark: #0f172a; --green: #22c55e; --bg: #f1f5f9; }
+        body { font-family: 'Pyidaungsu', sans-serif; background: var(--bg); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        
+        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); width: 100%; max-width: 400px; margin-bottom: 20px; box-sizing: border-box; }
+        
+        /* Menu Grid */
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; width: 100%; max-width: 400px; margin-bottom: 20px; }
+        .menu-item { background: white; padding: 12px 5px; border-radius: 12px; text-align: center; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .menu-item i { display: block; font-size: 20px; color: var(--primary); margin-bottom: 5px; }
+        .menu-item span { font-size: 11px; font-weight: bold; }
+
+        /* User Rows */
+        .user-card { background: white; padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border-left: 5px solid var(--primary); }
+        .user-info b { font-size: 15px; display: block; }
+        .user-info small { color: var(--green); font-weight: bold; }
+        
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1.5px solid #e2e8f0; border-radius: 12px; outline: none; text-align: center; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; color: white; background: var(--primary); }
+        .topup-btn { background: var(--green); color: white; padding: 10px 15px; border-radius: 8px; border: none; font-size: 12px; font-weight: bold; cursor: pointer; }
+
+        /* Slip Modal */
+        #slip-modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:100; justify-content:center; align-items:center; }
+        #slip-box { background:white; width:280px; padding:25px; border-radius:15px; text-align:center; border-top: 8px solid var(--green); }
+        .slip-row { display:flex; justify-content:space-between; border-bottom:1px dashed #eee; padding:10px 0; font-size:13px; }
+    </style>
+</head>
+<body>
+
+    <h2 style="color: var(--dark); margin-bottom: 20px;">KSO VIP <span style="color:var(--primary)">ADMIN</span></h2>
+
+    <div class="menu-grid">
+        <div class="menu-item" onclick="showPage('create-page')"><i class="fas fa-user-plus"></i><span>အကောင့်ဖွင့်</span></div>
+        <div class="menu-item" onclick="showPage('list-page')"><i class="fas fa-users-cog"></i><span>အက်မင်စာရင်း</span></div>
+        <div class="menu-item" onclick="showPage('topup-page')"><i class="fas fa-money-bill-wave"></i><span>ငွေဖြည့်ရန်</span></div>
+    </div>
+
+    <div id="topup-page" style="display:none; width: 100%; max-width: 400px;">
+        <h4 style="margin-bottom:15px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">ငွေဖြည့်သွင်းခြင်း (ကျန်ငွေပြထားသည်)</h4>
+        <div id="topup-user-list"></div>
+    </div>
+
+    <div id="create-page" class="card">
+        <h4 style="text-align:center; margin-top:0;">အကောင့်အသစ်ဖွင့်ရန်</h4>
+        <input type="text" id="reg-id" placeholder="နာမည် (ID)">
+        <input type="text" id="reg-pw" placeholder="စကားဝှက် (PW)">
+        <input type="number" id="reg-bal" placeholder="စတင်မည့်ငွေ" value="0">
+        <button class="btn" onclick="handleCreate()">စာရင်းသွင်းမည်</button>
+    </div>
+
+    <div id="list-page" style="display:none; width: 100%; max-width: 400px;">
+        <h4 style="margin-bottom:10px;">လူစာရင်းနှင့် အချက်အလက်</h4>
+        <div id="admin-user-list"></div>
+    </div>
+
+    <div id="slip-modal">
+        <div id="slip-box-container">
+            <div id="slip-box">
+                <i class="fas fa-check-circle" style="color:var(--green); font-size:45px; margin-bottom:10px;"></i>
+                <h3 style="margin:0;">KSO VIP PAYMENT</h3>
+                <p style="font-size:11px; color:#777;">Official Receipt</p>
+                <div class="slip-row"><span>အမည်:</span> <b id="s-id"></b></div>
+                <div class="slip-row"><span>ဖြည့်ငွေ:</span> <b id="s-amt" style="color:var(--green)"></b></div>
+                <div class="slip-row"><span>နေ့စွဲ:</span> <small id="s-date"></small></div>
+                <div class="slip-row"><span>အခြေအနေ:</span> <b style="color:var(--green)">SUCCESS</b></div>
+            </div>
+            <button class="btn" style="margin-top:15px; background:var(--dark);" onclick="closeModal()">ပိတ်မည်</button>
+        </div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, setDoc, collection, query, where, onSnapshot, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDGCsxM1ccZ_ZswwNPZDI-ykOm5yJU1CIw",
+        authDomain: "ksovip-f4ffd.firebaseapp.com",
+        projectId: "ksovip-f4ffd",
+        storageBucket: "ksovip-f4ffd.appspot.com",
+        messagingSenderId: "49241420110",
+        appId: "1:49241420110:android:c284c76cc6ea47410d2e1f"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.showPage = (id) => {
+        ['create-page', 'list-page', 'topup-page'].forEach(p => document.getElementById(p).style.display = 'none');
+        document.getElementById(id).style.display = 'block';
+        if(id === 'list-page' || id === 'topup-page') loadUsers(id);
+    };
+
+    window.handleCreate = async () => {
+        const id = document.getElementById('reg-id').value.trim();
+        const pw = document.getElementById('reg-pw').value.trim();
+        const bal = document.getElementById('reg-bal').value.trim();
+        if(!id || !pw) return alert("ဖြည့်ပါ");
+        await setDoc(doc(db, "users", id), { username: id, password: pw, balance: parseInt(bal)||0, createdBy: "Admin" });
+        alert("အောင်မြင်ပါသည်");
+        document.getElementById('reg-id').value=""; document.getElementById('reg-pw').value=""; document.getElementById('reg-bal').value="0";
+    };
+
+    function loadUsers(pageId) {
+        const q = query(collection(db, "users"), where("createdBy", "==", "Admin"));
+        onSnapshot(q, (snap) => {
+            const listId = pageId === 'list-page' ? 'admin-user-list' : 'topup-user-list';
+            const cont = document.getElementById(listId);
+            cont.innerHTML = "";
+            snap.forEach(d => {
+                const u = d.data();
+                if(pageId === 'list-page') {
+                    cont.innerHTML += `<div class="user-card"><div class="user-info"><b>${d.id}</b><small>Password: ${u.password}</small></div><div style="text-align:right"><b>${u.balance.toLocaleString()} Ks</b></div></div>`;
+                } else {
+                    // ငွေဖြည့် Menu မှာ ကျန်ငွေကိုပါ ပြထားတဲ့အပိုင်း
+                    cont.innerHTML += `
+                    <div class="user-card">
+                        <div class="user-info">
+                            <b>${d.id}</b>
+                            <small>လက်ရှိကျန်ငွေ: ${u.balance.toLocaleString()} Ks</small>
+                        </div>
+                        <button class="topup-btn" onclick="processTopup('${d.id}')">ငွေဖြည့်</button>
+                    </div>`;
+                }
+            });
+        });
+    }
+
+    window.processTopup = async (id) => {
+        const amt = prompt(id + " အတွက် ဖြည့်မည့်ပမာဏ:");
+        if(amt && !isNaN(amt)) {
+            const amount = parseInt(amt);
+            await updateDoc(doc(db, "users", id), { balance: increment(amount) });
+            
+            // စလစ်အတွက် အချက်အလက်ထည့်ခြင်း
+            document.getElementById('s-id').innerText = id;
+            document.getElementById('s-amt').innerText = amount.toLocaleString() + " Ks";
+            document.getElementById('s-date').innerText = new Date().toLocaleString();
+            document.getElementById('slip-modal').style.display = 'flex';
+
+            // စလစ်ကို ဓာတ်ပုံအဖြစ် Auto Download ဆွဲခြင်း
+            setTimeout(() => {
+                html2canvas(document.getElementById('slip-box')).then(canvas => {
+                    let link = document.createElement('a');
+                    link.download = `Slip-${id}-${Date.now()}.png`;
+                    link.href = canvas.toDataURL();
+                    link.click();
+                });
+            }, 500);
+        }
+    };
+
+    window.closeModal = () => document.getElementById('slip-modal').style.display = 'none';
+    showPage('create-page');
+</script>
+</body>
+</html>
