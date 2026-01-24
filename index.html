@@ -17,74 +17,76 @@
         .menu-item i { display: block; font-size: 18px; color: var(--primary); margin-bottom: 5px; }
         .menu-item span { font-size: 10px; font-weight: bold; }
 
-        .user-card { background: white; padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border-left: 5px solid var(--primary); }
-        .user-info b { font-size: 15px; display: block; color: var(--dark); }
-        .pass-tag { color: #ff3131; font-weight: bold; font-size: 13px; background: #fff1f1; padding: 1px 6px; border-radius: 4px; border: 1px solid #ffcccc; margin-top: 4px; display: inline-block; }
+        .user-card { background: white; padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.02); width: 100%; max-width: 400px; box-sizing: border-box; }
+        .info-sub { font-size: 11px; color: #64748b; display: block; margin-top: 2px; }
         
+        .copy-btn { background: #f1f5f9; border: none; padding: 5px 8px; border-radius: 8px; cursor: pointer; color: var(--dark); font-size: 12px; margin-left: 8px; }
+        .copy-btn:active { background: #e2e8f0; }
+
         input { width: 100%; padding: 12px; margin: 8px 0; border: 1.5px solid #e2e8f0; border-radius: 12px; outline: none; text-align: center; box-sizing: border-box; }
         .btn { width: 100%; padding: 12px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; color: white; background: var(--primary); }
-        .topup-btn { background: var(--green); color: white; padding: 10px 15px; border: none; border-radius: 10px; font-size: 12px; font-weight: bold; cursor: pointer; }
-        .del-btn { background: #fee2e2; color: #ef4444; border: 1px solid #fecaca; padding: 5px 10px; border-radius: 8px; font-size: 11px; cursor: pointer; }
+        .topup-btn { background: var(--green); color: white; padding: 8px 12px; border: none; border-radius: 10px; font-size: 11px; font-weight: bold; cursor: pointer; }
 
-        /* Slip Modal */
         #topup-modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:100; justify-content:center; align-items:center; }
-        .modal-content { background:white; width:300px; padding:20px; border-radius:15px; text-align:center; }
-        #slip-to-save { background: white; padding: 20px; border: 1px solid #eee; margin-bottom: 15px; border-top: 8px solid var(--green); }
-        .slip-row { display: flex; justify-content: space-between; border-bottom: 1px dashed #ddd; padding: 8px 0; font-size: 14px; }
+        .modal-content { background:white; width:330px; padding:20px; border-radius:15px; text-align:center; }
+        #slip-area { background: white; padding: 20px; border: 1px solid #eee; margin-bottom: 15px; border-top: 10px solid var(--green); }
+        .slip-title { color: var(--green); font-size: 20px; font-weight: bold; margin-bottom: 15px; display: block; }
+        .slip-row { display: flex; justify-content: space-between; border-bottom: 1px dashed #ddd; padding: 8px 0; font-size: 13px; }
     </style>
 </head>
 <body>
 
-    <h2 style="color: var(--dark); margin-bottom: 20px;">KSO VIP <span style="color:var(--primary)">ADMIN</span></h2>
+    <h2 style="color: var(--dark);">KSO VIP <span style="color:var(--primary)">ADMIN</span></h2>
 
     <div class="menu-grid">
         <div class="menu-item" onclick="showPage('create-page')"><i class="fas fa-user-plus"></i><span>အကောင့်ဖွင့်</span></div>
-        <div class="menu-item" onclick="showPage('list-page')"><i class="fas fa-user-shield"></i><span>Admin ဖွင့်</span></div>
-        <div class="menu-item" onclick="showPage('topup-page')"><i class="fas fa-money-bill-wave"></i><span>ငွေဖြည့်</span></div>
+        <div class="menu-item" onclick="showPage('admin-list-page')"><i class="fas fa-user-shield"></i><span>Admin ဖွင့်</span></div>
         <div class="menu-item" onclick="showPage('user-list-page')"><i class="fas fa-users"></i><span>User ဖွင့်</span></div>
+        <div class="menu-item" onclick="showPage('topup-page')"><i class="fas fa-money-bill-wave"></i><span>ငွေဖြည့်</span></div>
     </div>
 
     <div id="create-page" class="card">
         <h4 style="text-align:center; margin-top:0;">အကောင့်သစ်ဖွင့်ရန်</h4>
         <input type="text" id="reg-id" placeholder="နာမည် (ID)">
         <input type="text" id="reg-pw" placeholder="စကားဝှက် (PW)">
-        <input type="number" id="reg-bal" placeholder="စတင်မည့်ငွေ (0)">
+        <input type="number" id="reg-bal" placeholder="စတင်မည့်ငွေ (ငွေဖြည့်)">
         <button class="btn" onclick="handleCreate()">စာရင်းသွင်းမည်</button>
     </div>
 
-    <div id="list-page" style="display:none; width: 100%; max-width: 400px;">
-        <h4 style="margin-bottom:10px;">အက်ဒမင် ဖွင့်ထားသောစာရင်း (<span id="admin-count">0</span>)</h4>
-        <div id="admin-user-list"></div>
-    </div>
-
-    <div id="topup-page" style="display:none; width: 100%; max-width: 400px;">
-        <h4 style="margin-bottom:15px;">ငွေဖြည့်သွင်းခြင်း (Admin စာရင်း)</h4>
-        <div id="topup-user-list"></div>
+    <div id="admin-list-page" style="display:none; width: 100%; max-width: 400px;">
+        <h4 style="margin-bottom:10px;">Admin မှ ဖွင့်ထားသောစာရင်း</h4>
+        <div id="admin-only-list"></div>
     </div>
 
     <div id="user-list-page" style="display:none; width: 100%; max-width: 400px;">
-        <h4 style="margin-bottom:10px;">User များမှ ဖွင့်ထားသောစာရင်း</h4>
-        <div id="user-created-list"></div>
+        <h4 style="margin-bottom:10px;">User များမှတစ်ဆင့် ဖွင့်ထားသောစာရင်း</h4>
+        <div id="user-side-list"></div>
+    </div>
+
+    <div id="topup-page" style="display:none; width: 100%; max-width: 400px;">
+        <h4 style="margin-bottom:10px;">ငွေဖြည့်သွင်းခြင်း (Admin စာရင်း)</h4>
+        <div id="topup-list"></div>
     </div>
 
     <div id="topup-modal">
         <div class="modal-content">
-            <div id="slip-to-save">
-                <h3 style="color:var(--green); margin-top:0;">KSO VIP</h3>
-                <div class="slip-row"><span>အမည်:</span> <b id="slip-name"></b></div>
+            <div id="slip-area">
+                <span class="slip-title">KSO VIP - TOPUP</span>
+                <div class="slip-row"><span>ID အမည်:</span> <b id="slip-name"></b></div>
                 <div class="slip-row"><span>ရက်စွဲ:</span> <span id="slip-date"></span></div>
-                <div class="slip-row"><span>ဖြည့်ငွေ:</span> <b id="slip-amt-text" style="color:var(--green)">0 Ks</b></div>
-                <div class="slip-row" style="border:none;"><span>အခြေအနေ:</span> <b style="color:var(--green)">SUCCESS</b></div>
+                <div class="slip-row"><span>ယခင်လက်ကျန်:</span> <span id="old-bal-text">0</span></div>
+                <div class="slip-row"><span>ဖြည့်သွင်းငွေ:</span> <b id="topup-amt-text" style="color:var(--green)">+ 0</b></div>
+                <div class="slip-row" style="font-weight:bold; color:var(--green); border:none; font-size:16px;"><span>စုစုပေါင်း:</span> <b id="new-bal-text">0</b></div>
             </div>
-            <input type="number" id="input-amt" style="width:100%; padding:10px; margin-bottom:10px; border-radius:10px; border:1px solid #ddd; text-align:center;" placeholder="ဖြည့်မည့်ပမာဏ ရိုက်ပါ" oninput="updateSlipAmt()">
-            <button class="btn" style="background:var(--green);" onclick="saveAndDownload()">ဖြည့်မည် (Auto Save)</button>
-            <button class="btn" style="background:#64748b; margin-top:5px;" onclick="closeModal()">ပိတ်မည်</button>
+            <input type="number" id="input-amt" placeholder="ဖြည့်မည့်ပမာဏ" oninput="calculateTotal()">
+            <button class="btn" style="background:var(--green); margin-bottom:5px;" onclick="saveTopup()">ငွေဖြည့်မည် (Save Slip)</button>
+            <button class="btn" style="background:#64748b;" onclick="closeModal()">ပိတ်မည်</button>
         </div>
     </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, doc, setDoc, collection, onSnapshot, updateDoc, increment, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, collection, onSnapshot, updateDoc, increment, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyDGCsxM1ccZ_ZswwNPZDI-ykOm5yJU1CIw",
@@ -98,115 +100,91 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     let selectedId = "";
+    let currentBalance = 0;
+
+    window.copyText = (text, btn) => {
+        navigator.clipboard.writeText(text);
+        const originalText = btn.innerHTML;
+        btn.innerHTML = "<i class='fas fa-check'></i>";
+        setTimeout(() => { btn.innerHTML = originalText; }, 1500);
+    };
 
     window.showPage = (id) => {
-        ['create-page', 'list-page', 'topup-page', 'user-list-page'].forEach(p => {
+        ['create-page', 'admin-list-page', 'user-list-page', 'topup-page'].forEach(p => {
             document.getElementById(p).style.display = (p === id) ? 'block' : 'none';
         });
     };
 
-    // အကောင့်ဖွင့်
     window.handleCreate = async () => {
         const id = document.getElementById('reg-id').value.trim();
         const pw = document.getElementById('reg-pw').value.trim();
-        const bal = document.getElementById('reg-bal').value;
+        const bal = parseInt(document.getElementById('reg-bal').value) || 0;
         if(!id || !pw) return alert("ဖြည့်ပါ");
-        await setDoc(doc(db, "users", id), { username: id, password: pw, balance: parseInt(bal)||0, createdBy: "Admin" });
+        const exp = new Date(); exp.setDate(exp.getDate() + 30);
+        const expiryDate = exp.toISOString().split('T')[0];
+        await setDoc(doc(db, "users", id), { username: id, password: pw, balance: bal, createdBy: "Admin", expiryDate: expiryDate });
         alert("အောင်မြင်ပါသည်");
         document.getElementById('reg-id').value=""; document.getElementById('reg-pw').value=""; document.getElementById('reg-bal').value="";
     };
 
-    // အကောင့်ဖျက်
-    window.handleDelete = async (id) => {
-        if(confirm(id + " ကို ဖျက်ရန် သေချာပါသလား?")) {
-            await deleteDoc(doc(db, "users", id));
-        }
-    };
-
-    // Real-time Update
-    onSnapshot(collection(db, "users"), (snap) => {
-        const adminCont = document.getElementById('admin-user-list');
-        const userCont = document.getElementById('user-created-list');
-        const topupCont = document.getElementById('topup-user-list');
-        const adminCountDisp = document.getElementById('admin-count');
-
-        let adminHtml = ""; let userHtml = ""; let topupHtml = "";
-        let adminTotal = 0;
-
-        snap.forEach(d => {
-            const u = d.data();
-            const bal = (u.balance || 0).toLocaleString();
-
-            if (u.createdBy === "Admin") {
-                adminTotal++;
-                adminHtml += `
-                    <div class="user-card">
-                        <div class="user-info">
-                            <b>ID: ${u.username}</b>
-                            <span class="pass-tag">PW: ${u.password}</span>
-                        </div>
-                        <button class="del-btn" onclick="handleDelete('${d.id}')">ဖျက်မည်</button>
-                    </div>`;
-
-                topupHtml += `
-                    <div class="user-card">
-                        <div class="user-info">
-                            <b>ID: ${u.username}</b>
-                            <span class="pass-tag">PW: ${u.password}</span>
-                            <small style="display:block; color:var(--green); margin-top:5px;">လက်ကျန်: ${bal} Ks</small>
-                        </div>
-                        <button class="topup-btn" onclick="openTopupModal('${d.id}')">ငွေဖြည့်</button>
-                    </div>`;
-            } else if (u.createdBy) {
-                userHtml += `
-                    <div class="user-card">
-                        <div class="user-info">
-                            <b>ID: ${u.username || d.id}</b>
-                            <small style="display:block; color:gray;">BY: ${u.createdBy}</small>
-                        </div>
-                        <div style="text-align:right"><b>${bal} Ks</b></div>
-                    </div>`;
-            }
-        });
-        adminCont.innerHTML = adminHtml;
-        topupCont.innerHTML = topupHtml;
-        userCont.innerHTML = userHtml;
-        adminCountDisp.innerText = adminTotal;
-    });
-
-    // Topup Logic
-    window.openTopupModal = (id) => {
+    window.openTopupModal = async (id) => {
         selectedId = id;
+        const userDoc = await getDoc(doc(db, "users", id));
+        currentBalance = userDoc.data().balance || 0;
         document.getElementById('slip-name').innerText = id;
-        document.getElementById('slip-date').innerText = new Date().toLocaleString();
-        document.getElementById('input-amt').value = "";
-        document.getElementById('slip-amt-text').innerText = "0 Ks";
+        document.getElementById('slip-date').innerText = new Date().toLocaleString('en-GB');
+        document.getElementById('old-bal-text').innerText = currentBalance.toLocaleString();
+        document.getElementById('topup-amt-text').innerText = "+ 0";
+        document.getElementById('new-bal-text').innerText = currentBalance.toLocaleString();
         document.getElementById('topup-modal').style.display = 'flex';
     };
 
-    window.updateSlipAmt = () => {
-        const amt = document.getElementById('input-amt').value;
-        document.getElementById('slip-amt-text').innerText = (parseInt(amt)||0).toLocaleString() + " Ks";
+    window.calculateTotal = () => {
+        const amt = parseInt(document.getElementById('input-amt').value) || 0;
+        document.getElementById('topup-amt-text').innerText = "+ " + amt.toLocaleString();
+        document.getElementById('new-bal-text').innerText = (currentBalance + amt).toLocaleString();
     };
 
-    window.saveAndDownload = async () => {
-        const amt = document.getElementById('input-amt').value;
-        if(!amt || amt <= 0) return alert("ပမာဏထည့်ပါ");
-
-        await updateDoc(doc(db, "users", selectedId), { balance: increment(parseInt(amt)) });
-
-        html2canvas(document.getElementById('slip-to-save')).then(canvas => {
-            let link = document.createElement('a');
-            link.download = `Slip-${selectedId}.png`;
-            link.href = canvas.toDataURL();
-            link.click();
+    window.saveTopup = async () => {
+        const amt = parseInt(document.getElementById('input-amt').value);
+        if(!amt || amt <= 0) return alert("ငွေထည့်ပါ");
+        await updateDoc(doc(db, "users", selectedId), { balance: increment(amt) });
+        html2canvas(document.getElementById('slip-area')).then(canvas => {
+            let link = document.createElement('a'); link.download = `Slip-${selectedId}.png`;
+            link.href = canvas.toDataURL(); link.click();
         });
-
         alert("အောင်မြင်ပါသည်");
         closeModal();
     };
 
     window.closeModal = () => document.getElementById('topup-modal').style.display = 'none';
+    window.handleDelete = async (id) => { if(confirm(id + " ကို ဖျက်မည်လား?")) await deleteDoc(doc(db, "users", id)); };
+
+    onSnapshot(collection(db, "users"), (snap) => {
+        const adminCont = document.getElementById('admin-only-list');
+        const userCont = document.getElementById('user-side-list');
+        const topupCont = document.getElementById('topup-list');
+        let adminHtml = ""; let userHtml = ""; let topupHtml = "";
+
+        snap.forEach(d => {
+            const u = d.data();
+            const balVal = (u.balance || 0).toLocaleString();
+            const expVal = u.expiryDate || "-";
+            
+            if (u.createdBy === "Admin") {
+                adminHtml += `<div class="user-card"><div><b>ID: ${d.id} <button class="copy-btn" onclick="copyText('${d.id}', this)"><i class="far fa-copy"></i></button></b><span class="info-sub">PW: ${u.password}</span></div><button onclick="handleDelete('${d.id}')" style="background:none; border:none; color:red;"><i class="fas fa-trash"></i></button></div>`;
+                topupHtml += `<div class="user-card"><div><b>ID: ${d.id}</b><span style="color:var(--green)">လက်ရှိ: ${balVal}</span></div><button class="topup-btn" onclick="openTopupModal('${d.id}')">ငွေဖြည့်</button></div>`;
+            } 
+            else if (u.createdBy && u.createdBy !== "Admin" && u.createdBy !== d.id) {
+                userHtml += `<div class="user-card"><div><b>ID: ${d.id} <button class="copy-btn" onclick="copyText('${d.id}', this)"><i class="far fa-copy"></i></button></b><span class="info-sub">By: ${u.createdBy}</span><span class="info-sub" style="color:var(--primary)">ကုန်ရက်: ${expVal}</span></div><button onclick="handleDelete('${d.id}')" style="background:none; border:none; color:red;"><i class="fas fa-trash"></i></button></div>`;
+            }
+        });
+
+        adminCont.innerHTML = adminHtml || "<p style='text-align:center; font-size:12px; color:#999;'>စာရင်းမရှိပါ</p>";
+        userCont.innerHTML = userHtml || "<p style='text-align:center; font-size:12px; color:#999;'>စာရင်းမရှိပါ</p>";
+        topupCont.innerHTML = topupHtml || "<p style='text-align:center; font-size:12px; color:#999;'>စာရင်းမရှိပါ</p>";
+    });
+
     showPage('create-page');
 </script>
 </body>
